@@ -45,3 +45,7 @@ main.dSYM*
 main
 stb_image_write.h
 stb_image.h
+
+*.jpeg
+*.jpg
+*.png
