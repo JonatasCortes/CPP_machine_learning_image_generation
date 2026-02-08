@@ -1,15 +1,15 @@
 #include "../hpp/image.hpp"
 
-RgbImage::RgbImage(std::string image_path){
+DeltaEImage::DeltaEImage(std::string image_path){
 
-    int width, height, chanels, num_chanels = 3;
+    int width, height, channels;
     
     // The width is measured in PIXELS, not in BYTES!
     unsigned char* raw_data = stbi_load(image_path.c_str(),
                                     &width, &height,
-                                    &chanels, num_chanels);
+                                    &channels, this->NUM_CHANNELS);
 
-    size_t total_bytes = width * height * num_chanels;                             
+    size_t total_bytes = width * height * this->NUM_CHANNELS;                             
 
     if(not raw_data){
         throw std::runtime_error("Failed to fetch image data from: " + image_path);
@@ -24,80 +24,83 @@ RgbImage::RgbImage(std::string image_path){
     stbi_image_free(raw_data);
 }
 
-RgbImage::RgbImage(std::vector<uint8_t> image_data, int width, int height){
+DeltaEImage::DeltaEImage(std::vector<uint8_t> image_data, int width, int height){
     this->width = width;
     this->height = height;
     this->set_pixels(image_data, width, height);
 }
 
-void RgbImage::set_pixels(std::vector<uint8_t> image_data, int width, int height, int num_chanels){
+void DeltaEImage::set_pixels(const std::vector<uint8_t>& image_data, int width, int height){
+
+    int num_pixels = width * height;
+    int num_bytes = num_pixels * this->NUM_CHANNELS;
+    this->pixels.reserve(num_pixels);
     
-    std::vector<std::vector<RgbPixel>> pixels(height);
-    int width_in_bytes = width * num_chanels;
-    int x_offset = 0;
+    int byte_index, pixel_index;
 
-    for(int y_index = 0; y_index < height; y_index++){
-        for(int x_index = 0; x_index < width_in_bytes; x_index += num_chanels){
-            uint8_t red = image_data[x_index + x_offset + 0];
-            uint8_t green = image_data[x_index + x_offset + 1];
-            uint8_t blue = image_data[x_index + x_offset + 2];
-            pixels.at(y_index).push_back(RgbPixel(red, green, blue));
+    for(byte_index = 0, pixel_index = 0;
+        byte_index < num_bytes;
+        byte_index+=this->NUM_CHANNELS, pixel_index++){
 
-        }
-        x_offset += width_in_bytes;
+        uint8_t red = image_data[byte_index + 0];
+        uint8_t green = image_data[byte_index + 1];
+        uint8_t blue = image_data[byte_index + 2];
+
+        this->pixels.emplace_back(DeltaEPixel(red, green, blue));
     }
-
-    this->pixels = pixels;
 }
 
-std::vector<uint8_t> RgbImage::get_data(){
+std::vector<uint8_t> DeltaEImage::get_data(){
 
     std::vector<uint8_t> data;
+    int num_bytes = this->pixels.size() * this->NUM_CHANNELS;
+    data.resize(num_bytes);
 
-    for(auto row: this->pixels){
-        for(RgbPixel pixel: row){
-            data.push_back(pixel.red_channel);
-            data.push_back(pixel.green_channel);
-            data.push_back(pixel.blue_channel);
+    int pixel_index, byte_index;
 
-        }
+    for(pixel_index = 0, byte_index = 0;
+        pixel_index < this->pixels.size();
+        pixel_index++, byte_index+=this->NUM_CHANNELS){
+
+        data[byte_index+0] = this->pixels.at(pixel_index).get_red_channel();
+        data[byte_index+1] = this->pixels.at(pixel_index).get_green_channel();
+        data[byte_index+2] = this->pixels.at(pixel_index).get_blue_channel();
     }
 
     return data;
 }
 
-std::vector<std::vector<RgbPixel>> RgbImage::get_pixels(){
+std::vector<DeltaEPixel> DeltaEImage::get_pixels(){
     return this->pixels;
 }
 
-RgbPixel RgbImage::get_pixel_at(unsigned int x, unsigned int y){
+DeltaEPixel DeltaEImage::get_pixel_at(unsigned int x, unsigned int y){
     if(x >= this->width or x < 0){
         throw std::length_error("'x' coordinate is out of range.");
     }
     if(y >= this->height or y < 0){
         throw std::length_error("'y' coordinate is out of range.");
     }
-
-    return this->pixels.at(y).at(x);
+    int linearized_index = (y * this->width) + x;
+    return this->pixels.at(linearized_index);
 }
 
-int RgbImage::get_width(){
+int DeltaEImage::get_width(){
     return this->width;
 }
 
-int RgbImage::get_height(){
+int DeltaEImage::get_height(){
     return this->height;
 }
 
-void RgbImage::save(std::string path){
-    int num_chanels = 3;
-    int bytes_per_row = this->width * num_chanels;
-    std::vector<uint8_t> data = this->get_data();
+void DeltaEImage::save(std::string path){
+    int bytes_per_row = this->width * this->NUM_CHANNELS;
+
     bool result = stbi_write_png(path.c_str(),
                                  this->width,
                                  this->height,
-                                 num_chanels,
-                                 data.data(),
+                                 this->NUM_CHANNELS,
+                                 this->get_data().data(),
                                  bytes_per_row);
     if(not result){
         throw std::runtime_error("Failed to save image in path: " + path);
