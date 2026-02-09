@@ -46,6 +46,7 @@ main
 stb_image_write.h
 stb_image.h
 
-*.jpeg
-*.jpg
-*.png
+# Ignore images only in the root of the project
+/*.jpeg
+/*.jpg
+/*.png
