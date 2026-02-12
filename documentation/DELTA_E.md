@@ -94,7 +94,7 @@ The values in each colorspace are:
 |(0, 235, 0)|(0.297063, 0.594127, 0.0990211)|(81.52, -81.02, 78.19)|
 |(0, 255, 0)|(0.357576, 0.715152, 0.119192)|(87.73, -86.18, 83.18)|
 
-> [!INFO]
+> [!NOTE]
 > The algorythm used for the conversion RGB->CIE_XYZ can be found in the code, but the one used in the conversion RGB->CIE_LAB was: [rgb-to-lab-calculator](https://colordesigner.io/convert/rgbtolab).
 
 But the distances between the pairs of lines in each colorspace are: 
@@ -104,10 +104,10 @@ But the distances between the pairs of lines in each colorspace are:
 |20|0.0114983|20.3705|
 |20|0.136805|9.4962|
 
-> [!INFO]
+> [!NOTE]
 > Again, the `ΔXYZ` was calculated with the very own code of the project, but the `ΔLAB` was calculated with: [cie-76-calculator](https://colormine.org/delta-e-calculator).
 
-> [!Important]
+> [!IMPORTANT]
 > All the `Δ` were calculated as simple euclidian distances, but with the `ΔE2000` formula the **CIE_LAB** can be used to achieve way more precise results.
 
 That raises the question: why does the `CIE_XYZ` scale seems weird? Actualy, it is very precise for it's own purpouse. Differences in the `CIE_XYZ` colorspace represent phisical luminance variation.

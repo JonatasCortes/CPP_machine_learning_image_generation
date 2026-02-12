@@ -5,7 +5,7 @@ The objective of this project is to replicate the algorithm implemented in  http
 
 The image processing libraries used in this project are [stb_image.h](https://github.com/nothings/stb/blob/master/stb_image.h) and [stb_image_write.h](https://github.com/nothings/stb/blob/master/stb_image_write.h), both header-only.
 
-> [!INFO]
+> [!TIP]
 > Due to the large number of code present in the header files, I chose not to include them in the online repository, but in the links above you can have easy access to them.
 
 Notice that in the directory `include/` there is a `.gitkeep` file. It is there just to preserve de directories structure and can be removed once you have alocated the header files `stb_image.h` and `stb_image_write.h` there.
