@@ -23,6 +23,8 @@ class DeltaEImage{
         std::vector<DeltaEPixel> pixels;
         void set_pixels(const std::vector<uint8_t>& image_data, int width, int height);
 
+        int get_linearized_index(unsigned int x, unsigned int y);
+
     public:
 
         DeltaEImage(std::string image_path);
@@ -34,6 +36,8 @@ class DeltaEImage{
 
         int get_height();
         int get_width();
+
+        void set_pixel_at(unsigned int x, unsigned int y, DeltaEPixel pixel);
 
         void save(std::string path);
 };

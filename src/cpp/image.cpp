@@ -81,7 +81,7 @@ DeltaEPixel DeltaEImage::get_pixel_at(unsigned int x, unsigned int y){
     if(y >= this->height or y < 0){
         throw std::length_error("'y' coordinate is out of range.");
     }
-    int linearized_index = (y * this->width) + x;
+    int linearized_index = this->get_linearized_index(x, y);
     return this->pixels.at(linearized_index);
 }
 
@@ -105,4 +105,13 @@ void DeltaEImage::save(std::string path){
     if(not result){
         throw std::runtime_error("Failed to save image in path: " + path);
     }
+}
+
+int DeltaEImage::get_linearized_index(unsigned int x, unsigned int y){
+    return (y * this->width) + x;
+}
+
+void DeltaEImage::set_pixel_at(unsigned int x, unsigned int y, DeltaEPixel pixel){
+    int linearized_index = this->get_linearized_index(x, y);
+    this->pixels[linearized_index] = pixel;
 }
