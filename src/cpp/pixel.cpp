@@ -69,7 +69,7 @@ float DeltaEPixel::non_linear_CIE_LAB_lightness_correction(float normalized_cie_
     constexpr double cubic_delta = squared_delta * delta;
 
     if(component > cubic_delta)
-        return static_cast<float>(pow(component, 1.0/3.0));
+        return static_cast<float>(cbrt(component));
 
     return static_cast<float>((component / (3 * squared_delta)) + (4.0/29.0));
 }
@@ -111,7 +111,7 @@ array<float, 3> DeltaEPixel::linearize_rgb_values(uint8_t red, uint8_t green, ui
         linearized_rgb[index] = this->linearize_rgb_channel(channel);
         index++;        
     }
-
+    
     return linearized_rgb;
 }
 
